@@ -1,0 +1,3 @@
+[submodule "xbee"]
+	path = xbee
+	url = https://github.com/digidotcom/xbee_ansic_library.git

@@ -1,0 +1,6 @@
+zigbeeManufacturer:
+  - id: "lovegrovecorp/whichswitch"
+    deviceLabel: Lightswitch
+    manufacturer: lovegrovecorp
+    model: whichswitch
+    deviceProfileName: st-whichswitch

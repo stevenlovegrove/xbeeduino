@@ -1,0 +1,4 @@
+name: 'WhichSwitch'
+packageKey: 'whichswitch'
+permissions:
+  zigbee: {}
