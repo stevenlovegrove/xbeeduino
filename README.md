@@ -35,10 +35,15 @@ The radio modules must be configured to operate in a mode that is compatible wit
 Once your device is connected, it's convenient to run your device program on your PC for (arguably) much simpler debugging. For convenience, I've included a CMake build script which should work on Linux / OSX (A Windows PR would be a great contribution :D - ask for pointers if you're interested).
 
 ```
-mkdir build && cd build
+git clone --recursive https://github.com/stevenlovegrove/xbeeduino.git
+cd xbeeduino && mkdir build && cd build
 cmake ..
 cmake --build .
 ./build/xbeeduino /dev/tty-usbserial-XXXX 115200
+
+# Now ready to connect! Install the SmartThings Edge Drive Below
+# Then 'Add Device' > 'Scan Nearby' from your smartphone
+# You should see some messages here as the hub communicates with the device.
 ```
 
 
