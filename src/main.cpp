@@ -28,13 +28,17 @@
 /// Application state / Logic
 ///
 
+// Dummy state that we are managing (representing virtual relays)
+bool_t relay1_value = false;
+bool_t relay2_value = false;
+
 // Zigbee endpoint identifiers for our two controllable relays
 constexpr uint8_t RELAY1_ENDPOINT = 0x00;
 constexpr uint8_t RELAY2_ENDPOINT = 0x01;
 
+
+// Mark as true to cause main loop to report attribute value change
 bool queue_update = false;
-bool_t relay1_value = false;
-bool_t relay2_value = false;
 
 bool get_relay(uint8_t endpoint) {
     if(endpoint == RELAY1_ENDPOINT) {
@@ -133,16 +137,10 @@ const zcl_attribute_base_t relay1_attributes[] = {
     { ZCL_ONOFF_ATTR_ONOFF, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_LOGICAL_BOOLEAN, &relay1_value},
     { ZCL_ATTRIBUTE_END_OF_LIST }
 };
-const zcl_attribute_tree_t relay1_tree[] =   {
-    { ZCL_MFG_NONE, &relay1_attributes[0], NULL }
-};
 
 const zcl_attribute_base_t relay2_attributes[] = {
     { ZCL_ONOFF_ATTR_ONOFF, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_LOGICAL_BOOLEAN, &relay1_value},
     { ZCL_ATTRIBUTE_END_OF_LIST }
-};
-const zcl_attribute_tree_t relay2_tree[] =   {
-    { ZCL_MFG_NONE, &relay1_attributes[0], NULL }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
