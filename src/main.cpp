@@ -36,10 +36,11 @@ bool_t relay2_value = false;
 constexpr uint8_t RELAY1_ENDPOINT = 0x00;
 constexpr uint8_t RELAY2_ENDPOINT = 0x01;
 
-
-// Mark as true to cause main loop to report attribute value change
+// Marker for whether we need to report an attribute value change.
+// Mark as true to cause main loop to report current value
 bool queue_update = false;
 
+// Get state variable based on Endpoint ID
 bool get_relay(uint8_t endpoint) {
     if(endpoint == RELAY1_ENDPOINT) {
         return relay1_value;
@@ -51,6 +52,7 @@ bool get_relay(uint8_t endpoint) {
     }
 }
 
+// Set state variable based on Endpoint ID
 void set_relay(uint8_t endpoint, bool on) {
 
     if(endpoint == RELAY1_ENDPOINT) {
@@ -68,7 +70,11 @@ void set_relay(uint8_t endpoint, bool on) {
 /// Endpoint Handlers
 ///
 
-int custom_ep_rx_on_off_cluster(const wpan_envelope_t FAR *envelope, void FAR *context)
+/// Handle PROFILE and CLUSTER Zigbee messages for ZCL_CLUST_ONOFF cluster
+/// This is the main application radio logic. \p envelope contains the received packet data.
+/// The packet is directed to the endpoint `zcl.envelope->dest_endpoint` which for us
+/// will be RELAY1_ENDPOINT or RELAY2_ENDPOINT
+int rx_handler_on_off_cluster(const wpan_envelope_t FAR *envelope, void FAR */*context*/)
 {
     zcl_command_t zcl;
     if(zcl_command_build(&zcl, envelope, nullptr) == 0) {
@@ -149,13 +155,13 @@ const zcl_attribute_base_t relay2_attributes[] = {
 
 const wpan_cluster_table_entry_t relay1_clusters[] = {
     ZCL_CLUST_ENTRY_BASIC_SERVER,
-    {ZCL_CLUST_ONOFF, custom_ep_rx_on_off_cluster, zcl_attributes_none, WPAN_CLUST_FLAG_INPUT},
+    {ZCL_CLUST_ONOFF, rx_handler_on_off_cluster, zcl_attributes_none, WPAN_CLUST_FLAG_INPUT},
     WPAN_CLUST_ENTRY_LIST_END
 };
 
 const wpan_cluster_table_entry_t relay2_clusters[] = {
     ZCL_CLUST_ENTRY_BASIC_SERVER,
-    {ZCL_CLUST_ONOFF, custom_ep_rx_on_off_cluster, zcl_attributes_none, WPAN_CLUST_FLAG_INPUT},
+    {ZCL_CLUST_ONOFF, rx_handler_on_off_cluster, zcl_attributes_none, WPAN_CLUST_FLAG_INPUT},
     WPAN_CLUST_ENTRY_LIST_END
 };
 
