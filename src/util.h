@@ -80,3 +80,14 @@ bool check_xbee_result(int res)
 
     return false;
 }
+
+#ifdef LITTLE_ENDIAN
+template<typename T, typename BT>
+T get_from_le_buffer(const BT* buffer, unsigned byte_offset)
+{
+    const uint8_t* p = (const uint8_t*)buffer;
+    return *(T*)(p+byte_offset);
+}
+#else
+#  error "Need to check this on your platform"
+#endif

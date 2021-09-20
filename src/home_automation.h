@@ -108,7 +108,7 @@ void setup_zigbee_homeautomation_params(xbee_dev_t& xdev)
 /// Report ZHA attribute change
 ///
 
-void report_attrib(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint) {
+void report_attribs(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint) {
     // This is meant for device side triggered notifications on state change
     PACKED_STRUCT request {
         zcl_header_nomfg_t header;
