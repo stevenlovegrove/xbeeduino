@@ -1,3 +1,5 @@
+#pragma once
+
 #include <xbee/discovery.h>
 #include <xbee/atcmd.h>
 #include <zigbee/zcl.h>

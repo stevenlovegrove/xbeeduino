@@ -5,6 +5,7 @@
 
 uint8_t* put_atrib(uint8_t* buffer, const zcl_attribute_base_t* entry, bool include_success, unsigned max_size_bytes)
 {
+    assert(entry);
     uint8_t* dest = buffer;
     dest = put_in_le_buffer<uint16_t>(entry->id, dest);
     if(include_success) dest = put_in_le_buffer<uint8_t>(ZCL_STATUS_SUCCESS, dest);
@@ -33,6 +34,7 @@ uint8_t* put_attrib_requests(uint8_t* buffer, zcl_attribute_base_t* attrib_table
 
 uint8_t* put_attrib_table(uint8_t* buffer, zcl_attribute_base_t* attrib_table, unsigned max_size_bytes)
 {
+    assert(attrib_table);
     uint8_t* dest = buffer;
     for(zcl_attribute_base_t* entry = attrib_table; entry && entry->id != ZCL_ATTRIBUTE_END_OF_LIST; ++entry) {
         dest = put_atrib(dest, entry, false, max_size_bytes - (dest-buffer));
@@ -42,6 +44,7 @@ uint8_t* put_attrib_table(uint8_t* buffer, zcl_attribute_base_t* attrib_table, u
 
 int send_attrib_requests(zcl_command_t& request, zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests)
 {
+    assert(attrib_table);
     const unsigned MAX_SIZE=40;
     PACKED_STRUCT{
         zcl_header_response_t header;
