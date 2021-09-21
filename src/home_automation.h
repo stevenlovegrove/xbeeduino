@@ -1,6 +1,7 @@
 #include <xbee/discovery.h>
 #include <xbee/atcmd.h>
 #include <zigbee/zcl.h>
+#include <zigbee/zcl_client.h>
 #include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////

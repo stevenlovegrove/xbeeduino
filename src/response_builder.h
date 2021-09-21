@@ -22,7 +22,16 @@ struct response_builder_t
         zcl_command_t& zcl;
         uint8_t *hdr, *dst;
         sender& operator<<(uint8_t d) { *(dst++) = d; return *this; }
-        sender& operator,(uint8_t d) { *(dst++) = d; return *this; }
+        sender& operator<<(uint16_t d) {
+            put_in_le_buffer(d, dst);
+            dst+=2; return *this;
+        }
+        sender& operator<<(const zcl_attribute_base_t& attrib) {
+            dst += zcl_encode_attribute_value(dst, MAX_SIZE - (dst-hdr), &attrib);
+            return *this;
+        }
+        template<typename T>
+        sender& operator,(const T& d) { return (*this) << d; }
     };
 
     sender send(zcl_command_t& response_for, uint8_t command, bool force_profile = false) {

@@ -85,8 +85,16 @@ bool check_xbee_result(int res)
 template<typename T, typename BT>
 T get_from_le_buffer(const BT* buffer, unsigned byte_offset)
 {
-    const uint8_t* p = (const uint8_t*)buffer;
-    return *(T*)(p+byte_offset);
+    const uint8_t* p = (const uint8_t*)buffer + byte_offset;
+    return *(T*)(p);
+}
+
+template<typename T, typename BT>
+BT* put_in_le_buffer(T val, BT* buffer, unsigned byte_offset=0)
+{
+    const uint8_t* p = (const uint8_t*)buffer + byte_offset;
+    *(T*)(p) = val;
+    return buffer + sizeof(T);
 }
 #else
 #  error "Need to check this on your platform"
