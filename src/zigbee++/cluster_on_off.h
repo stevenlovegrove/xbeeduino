@@ -8,10 +8,19 @@
 struct cluster_on_off : public cluster_interface
 {
     constexpr static uint16_t CLUSTOR_ID = ZCL_CLUST_ONOFF;
-    using fn_try_update = void(void);
+
+    struct event {
+        uint8_t endpoint;
+        cluster_on_off& cluster;
+        bool_t new_value;
+    };
+
+    // User notification of command to change state
+    // Return true to allow update
+    using fn_updated_t = bool(event);
 
     cluster_on_off()
-        : user_fn_try_update(nullptr),
+        : fn_updated(nullptr),
           attributes{
             { ZCL_ONOFF_ATTR_ONOFF, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_LOGICAL_BOOLEAN, &current_value},
             { ZCL_ATTRIBUTE_END_OF_LIST }
@@ -24,15 +33,17 @@ struct cluster_on_off : public cluster_interface
 
     void command(zcl_command_t& zcl) override
     {
+        event e = {zcl.envelope->dest_endpoint, *this};
+
         switch(zcl.command) {
         case ZCL_ONOFF_CMD_OFF:
-            current_value = false;
+            e.new_value = false;
             break;
         case ZCL_ONOFF_CMD_ON:
-            current_value = true;
+            e.new_value = true;
             break;
         case ZCL_ONOFF_CMD_TOGGLE:
-            current_value = !current_value;
+            e.new_value = !current_value;
             break;
         default:
             log("Unrecognized command.\n");
@@ -40,7 +51,10 @@ struct cluster_on_off : public cluster_interface
             zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
             return;
         }
-        if(user_fn_try_update) user_fn_try_update();
+        // Only actually update if user function accepts change.
+        if(!fn_updated || (fn_updated && fn_updated(e))) {
+            current_value = e.new_value;
+        }
         send_attrib_table_response(zcl, attributes);
     }
 
@@ -50,7 +64,7 @@ struct cluster_on_off : public cluster_interface
     }
 
 
-    fn_try_update* user_fn_try_update;
+    fn_updated_t* fn_updated;
     zcl_attribute_base_t attributes[2];
     bool_t current_value;
 };

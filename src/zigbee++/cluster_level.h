@@ -8,10 +8,18 @@
 struct cluster_level : public cluster_interface
 {
     constexpr static uint16_t CLUSTOR_ID = ZCL_CLUST_LEVEL_CONTROL;
-    using fn_try_update = void(void);
+
+    struct event {
+        uint8_t endpoint;
+        cluster_level& cluster;
+        uint8_t new_value;
+        uint16_t transition_time;
+    };
+
+    using fn_updated_t = bool(event);
 
     cluster_level()
-        : user_fn_try_update(nullptr),
+        : fn_updated(nullptr),
           attributes{
             { ZCL_LEVEL_ATTR_CURRENT_LEVEL, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_UNSIGNED_8BIT, &current_level},
             { ZCL_ATTRIBUTE_END_OF_LIST }
@@ -25,6 +33,8 @@ struct cluster_level : public cluster_interface
 
     void command(zcl_command_t& zcl) override
     {
+        event e = {zcl.envelope->dest_endpoint, *this};
+
         switch(zcl.command) {
         case ZCL_LEVEL_CMD_MOVE:
             log("ZCL_LEVEL_CMD_MOVE\n");
@@ -39,10 +49,8 @@ struct cluster_level : public cluster_interface
             [[fallthrough]];
         case ZCL_LEVEL_CMD_MOVE_TO_LEVEL_ON_OFF:
         {
-            const uint8_t level = get_from_le_buffer<uint8_t>(zcl.zcl_payload,0);
-            const uint16_t transition_time = get_from_le_buffer<uint8_t>(zcl.zcl_payload,1);
-            log("Setting level to %d%% (transition time %d)\n", (int)((100.0f/255.0f)*level+0.5f), transition_time);
-            current_level = level;
+            e.new_value = get_from_le_buffer<uint8_t>(zcl.zcl_payload,0);
+            e.transition_time = get_from_le_buffer<uint8_t>(zcl.zcl_payload,1);
             break;
         }
         case ZCL_LEVEL_CMD_MOVE_ON_OFF:
@@ -60,7 +68,10 @@ struct cluster_level : public cluster_interface
             zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
             return;
         }
-        if(user_fn_try_update) user_fn_try_update();
+        // Only actually update if user function accepts change.
+        if(!fn_updated || (fn_updated && fn_updated(e))) {
+            current_level = e.new_value;
+        }
         send_attrib_table_response(zcl, attributes);
     }
 
@@ -69,7 +80,7 @@ struct cluster_level : public cluster_interface
         return attributes;
     }
 
-    fn_try_update* user_fn_try_update;
+    fn_updated_t* fn_updated;
     zcl_attribute_base_t attributes[2];
     uint8_t current_level;
 };

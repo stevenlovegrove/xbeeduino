@@ -3,9 +3,6 @@
 #include "zigbee++/cluster_on_off.h"
 #include "zigbee++/cluster_basic.h"
 
-zigbee_endpoint<cluster_basic,cluster_on_off,cluster_level> ep0(0x00, "ep0");
-zigbee_endpoint<cluster_basic,cluster_on_off,cluster_level> ep1(0x01, "ep1");
-zigbee_session session(ep0, ep1);
 
 int main(int argc, char *argv[])
 {
@@ -18,12 +15,26 @@ int main(int argc, char *argv[])
     cluster_basic::set_manufacturer_name("lovegrovecorp");
     cluster_basic::set_model_identifier("whichswitch");
 
-    ep0.get<cluster_on_off>().user_fn_try_update = [](){
-        log("ep0 switch\n");
+    zigbee_endpoint<cluster_basic,cluster_on_off,cluster_level> endpoints[] = {
+        {0x00, "switch0"}, {0x01, "switch1"}
     };
-    ep1.get<cluster_on_off>().user_fn_try_update = [](){
-        log("ep1 switch\n");
+
+    zigbee_session session(endpoints[0], endpoints[1]);
+
+    auto updated_on_off = [](cluster_on_off::event e) {
+        log("Endpoint %d turned %s\n", e.endpoint, e.new_value ? "on" : "off");
+        return true;
     };
+    auto updated_level = [](cluster_level::event e) {
+        const int percent = (int)((100.0f/255.0f)*e.new_value+0.5f);
+        log("Endpoint %d set level to %d%% (transition time %d)\n", e.endpoint, percent, e.transition_time);
+        return true;
+    };
+
+    endpoints[0].get<cluster_on_off>().fn_updated = updated_on_off;
+    endpoints[1].get<cluster_on_off>().fn_updated = updated_on_off;
+    endpoints[0].get<cluster_level>().fn_updated = updated_level;
+    endpoints[1].get<cluster_level>().fn_updated = updated_level;
 
     // Setup params
     xbee_serial_t xbee_serial_config = { 0, 0, "" };
