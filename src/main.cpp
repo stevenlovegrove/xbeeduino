@@ -7,6 +7,7 @@
 #include "zigbee++/zigbee_session.h"
 #include "zigbee++/cluster_level.h"
 #include "zigbee++/cluster_on_off.h"
+#include "zigbee++/cluster_basic.h"
 #include "zigbee++/util.h"
 
 zigbee_endpoint<cluster_on_off,cluster_level> ep0(0x00, "ep0");
