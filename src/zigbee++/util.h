@@ -1,17 +1,8 @@
 #pragma once
 
-#include <cstdio>
 #include <chrono>
 #include <thread>
-
-inline void log(const char* format, ...)
-{
-    va_list arglist;
-    va_start( arglist, format );
-    vprintf( format, arglist );
-    va_end( arglist );
-    fflush(stdout);
-}
+#include "log.h"
 
 inline void delay(unsigned long ms)
 {
@@ -81,21 +72,4 @@ bool check_xbee_result(int res)
     return false;
 }
 
-#ifdef LITTLE_ENDIAN
-template<typename T, typename BT>
-T get_from_le_buffer(const BT* buffer, unsigned byte_offset)
-{
-    const uint8_t* p = (const uint8_t*)buffer + byte_offset;
-    return *(T*)(p);
-}
 
-template<typename T, typename BT>
-BT* put_in_le_buffer(T val, BT* buffer, unsigned byte_offset=0)
-{
-    const uint8_t* p = (const uint8_t*)buffer + byte_offset;
-    *(T*)(p) = val;
-    return buffer + sizeof(T);
-}
-#else
-#  error "Need to check this on your platform"
-#endif

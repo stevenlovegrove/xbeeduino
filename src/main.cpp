@@ -1,34 +1,16 @@
-// Project derived largely from https://github.com/exsilium/pxbee-trigger with some refactoring
-// and simplification for my own education and code needs. Thanks exsilium!
-
-
+// These defines are used within <zigbee/zcl_basic_attributes.h>
+// for reporting to communicating devices.
 #define ZCL_MANUFACTURER_NAME "lovegrovecorp"
 #define ZCL_MODEL_IDENTIFIER  "whichswitch"
 #define ZCL_POWER_SOURCE      ZCL_BASIC_PS_DC
 
-#include <cstdint>
+#include "zigbee++/zigbee_session.h"
+#include "zigbee++/cluster_level.h"
+#include "zigbee++/cluster_on_off.h"
+#include "zigbee++/util.h"
 
-#include <wpan/types.h>
-#include <wpan/aps.h>
-#include <util.h>
-#include <xbee/atcmd.h>
-#include <xbee/sxa.h>
-#include <zigbee/zdo.h>
-#include <zigbee/zcl.h>
-#include <zigbee/zcl_client.h>
-#include <zigbee/zcl_basic.h>
-//#include <zigbee/zcl_basic_attributes.h>
-#include <zigbee/zcl_onoff.h>
-
-#include "obj.h"
-#include "util.h"
-#include "home_automation.h"
-#include "response_builder.h"
-#include "zcl_level.h"
-#include "cluster_handler.h"
-
-custom_zha_endpoint<cluster_on_off,cluster_level> ep0(0x00, "ep0");
-custom_zha_endpoint<cluster_on_off,cluster_level> ep1(0x01, "ep1");
+zigbee_endpoint<cluster_on_off,cluster_level> ep0(0x00, "ep0");
+zigbee_endpoint<cluster_on_off,cluster_level> ep1(0x01, "ep1");
 zigbee_session session(ep0, ep1);
 
 int main(int argc, char *argv[])
@@ -58,5 +40,3 @@ int main(int argc, char *argv[])
         delay(1);
     }
 }
-
-
