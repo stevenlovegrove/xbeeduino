@@ -1,33 +1,41 @@
 #pragma once
 
 #include <tuple>
+#include <xbee/wpan.h>
 #include <zigbee/zcl.h>
 #include <zigbee/zcl_basic.h>
 #include <zigbee/zcl_basic_attributes.h>
 #include <zigbee/zdo.h>
-#include "cluster_handler.h"
 #include <zigbee/zcl_onoff.h>
+#include "cluster_handler.h"
 #include "zcl_level.h"
 #include "home_automation.h"
 
-struct clustor_on_off
+struct cluster_interface
+{
+    virtual void config(zcl_command_t& zcl) = 0;
+    virtual void command(zcl_command_t& zcl) = 0;
+    virtual zcl_attribute_base_t* get_attribs() = 0;
+};
+
+struct cluster_on_off : public cluster_interface
 {
     constexpr static uint16_t CLUSTOR_ID = ZCL_CLUST_ONOFF;
     using fn_try_update = void(void);
 
-    clustor_on_off()
+    cluster_on_off()
         : user_fn_try_update(nullptr),
           attributes{
             { ZCL_ONOFF_ATTR_ONOFF, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_LOGICAL_BOOLEAN, &current_value},
             { ZCL_ATTRIBUTE_END_OF_LIST }
         } {}
 
-    void config(zcl_command_t& zcl)
+    void config(zcl_command_t& zcl) override
     {
         send_configure_response(zcl, ZCL_STATUS_SUCCESS);
     }
 
-    void command(zcl_command_t& zcl)
+    void command(zcl_command_t& zcl) override
     {
         switch(zcl.command) {
         case ZCL_ONOFF_CMD_OFF:
@@ -52,31 +60,36 @@ struct clustor_on_off
         send_attrib_table_response(zcl, attributes);
     }
 
+    zcl_attribute_base_t* get_attribs() override
+    {
+        return attributes;
+    }
+
 
     fn_try_update* user_fn_try_update;
     zcl_attribute_base_t attributes[2];
     bool_t current_value;
 };
 
-struct clustor_level
+struct cluster_level : public cluster_interface
 {
     constexpr static uint16_t CLUSTOR_ID = ZCL_CLUST_LEVEL_CONTROL;
     using fn_try_update = void(void);
 
-    clustor_level()
+    cluster_level()
         : user_fn_try_update(nullptr),
           attributes{
             { ZCL_LEVEL_ATTR_CURRENT_LEVEL, ZCL_ATTRIB_FLAG_NONE, ZCL_TYPE_UNSIGNED_8BIT, &current_level},
             { ZCL_ATTRIBUTE_END_OF_LIST }
         } {}
 
-    void config(zcl_command_t& zcl)
+    void config(zcl_command_t& zcl) override
     {
         // TODO: Actually configure from params sent
         send_configure_response(zcl, ZCL_STATUS_SUCCESS);
     }
 
-    void command(zcl_command_t& zcl)
+    void command(zcl_command_t& zcl) override
     {
         switch(zcl.command) {
         case ZCL_LEVEL_CMD_MOVE:
@@ -115,6 +128,11 @@ struct clustor_level
         }
         if(user_fn_try_update) user_fn_try_update();
         send_attrib_table_response(zcl, attributes);
+    }
+
+    zcl_attribute_base_t* get_attribs() override
+    {
+        return attributes;
     }
 
     fn_try_update* user_fn_try_update;
@@ -156,53 +174,41 @@ struct custom_zha_endpoint
     }
 
 private:
-    zcl_attribute_base_t* get_attribs_for_cluster(uint16_t cluster_id) {
-        for(unsigned i=0; i < NUM_CLUSTERS; ++i) {
-            if(clustertable[i].cluster_id == cluster_id) {
-                return attrib_table_for_cluster[i];
-            }
+    // Base case for variadic recursion below
+    template<typename C>
+    cluster_interface* get_cluster_by_id(uint16_t cluster_id)
+    {
+        if( C::CLUSTOR_ID == cluster_id ) {
+            return dynamic_cast<cluster_interface*>(&std::get<C>(clusters));
         }
         return nullptr;
     }
 
-    template<typename C>
-    void forward_cluster_command(zcl_command_t& zcl) {
-        if( C::CLUSTOR_ID == zcl.envelope->cluster_id ) {
-            std::get<C>(clusters).command(zcl);
-        }
-    }
-
+    // Glorified switch statement to map from cluster_id into clusters tuple.
     template<typename C, typename Cn, typename... Cs>
-    void forward_cluster_command(zcl_command_t& zcl)
+    cluster_interface* get_cluster_by_id(uint16_t cluster_id)
     {
-        forward_cluster_command<C>(zcl);
-        forward_cluster_command<Cn, Cs...>(zcl);
+        cluster_interface* c = get_cluster_by_id<C>(cluster_id);
+        return c ? c : get_cluster_by_id<Cn, Cs...>(cluster_id);
     }
 
-
-    // specific to this endpoint, any clustor
+    // Handle any messages for clusters in this endpoint
     int dispatch_handler(const wpan_envelope_t *envelope)
     {
         zcl_command_t zcl;
         if(zcl_command_build(&zcl, envelope, nullptr) == 0) {
-            // Handle all the commands
+            cluster_interface* cluster = get_cluster_by_id<Clusters...>(envelope->cluster_id);
+            assert(cluster);
+
             if(ZCL_CMD_MATCH(&zcl.frame_control, GENERAL, CLIENT_TO_SERVER, PROFILE)) {
                 if(zcl.command == ZCL_CMD_READ_ATTRIB) {
                     assert(zcl.length%2 ==0);
-                    zcl_attribute_base_t* attribs = get_attribs_for_cluster(zcl.envelope->cluster_id);
-                    if(attribs) {
-                        send_attrib_requests(zcl, attribs, zcl.length / 2, (uint16_t*)zcl.zcl_payload);
-                    }else{
-                        return zcl_default_response(&zcl, ZCL_STATUS_INVALID_SELECTOR);
-                    }
+                    send_attrib_requests(zcl, cluster->get_attribs(), zcl.length / 2, (uint16_t*)zcl.zcl_payload);
                     return 0;
                 } else if(zcl.command == ZCL_CMD_CONFIGURE_REPORT) {
-                    log("Handling response for configure report command\n");
-                    // TODO: Clustor specific configuration
-                    send_configure_response(zcl, ZCL_STATUS_SUCCESS);
+                    cluster->config(zcl);
                     return 0;
                 } else if(zcl.command == ZCL_CMD_DEFAULT_RESP) {
-                    log("Got default response\n");
                     return zcl_default_response(&zcl, ZCL_STATUS_SUCCESS);
                 }else {
                     log("Unhandled Profile command received\n");
@@ -210,7 +216,7 @@ private:
                     return zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
                 }
             }else if(ZCL_CMD_MATCH(&zcl.frame_control, GENERAL, CLIENT_TO_SERVER, CLUSTER)) {
-                forward_cluster_command<Clusters...>(zcl);
+                cluster->command(zcl);
                 return 0;
             }else{
                 log("Unrecognized cluster message.\n");
@@ -239,12 +245,12 @@ private:
 };
 
 template<typename... Endpoints>
-struct custom_endpoint_table
+struct zigbee_session
 {
     constexpr static unsigned CUSTOM_ENDPOINTS = sizeof...(Endpoints);
     constexpr static unsigned TOTAL_ENDPOITNS = CUSTOM_ENDPOINTS+3;
 
-    custom_endpoint_table(Endpoints... endpoints)
+    zigbee_session(Endpoints&... endpoints)
         : table{
               endpoints.entry()...,
               DIGI_DISC_ENDPOINT(),
@@ -252,10 +258,30 @@ struct custom_endpoint_table
               WPAN_ENDPOINT_TABLE_END
           }
     {
-
     }
 
+    void start(const xbee_serial_t& xbee_serial_config)
+    {
+        check_xbee_result(xbee_dev_init( &xdev, &xbee_serial_config, NULL, NULL));
+        setup_zigbee_homeautomation_params(xdev);
+        check_xbee_result(xbee_wpan_init( &xdev, table));
+    }
+
+    void process_pending_frames()
+    {
+        check_xbee_result(xbee_dev_tick(&xdev));
+    }
+
+    xbee_dev_t xdev;
     wpan_ep_state_t ep_state_zdo;
     const wpan_endpoint_table_entry_t table[TOTAL_ENDPOITNS+1]; // include LIST_END
+};
+
+// This is extern referenced from device.h and sets up main processing commands.
+const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
+{
+    XBEE_FRAME_HANDLE_RX_EXPLICIT,
+    XBEE_FRAME_HANDLE_LOCAL_AT,
+    XBEE_FRAME_TABLE_END
 };
 
