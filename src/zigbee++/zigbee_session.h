@@ -35,12 +35,3 @@ struct zigbee_session
     wpan_ep_state_t ep_state_zdo;
     const wpan_endpoint_table_entry_t table[TOTAL_ENDPOITNS+1]; // include LIST_END
 };
-
-// This is extern referenced from device.h and sets up main processing commands.
-const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
-{
-    XBEE_FRAME_HANDLE_RX_EXPLICIT,
-    XBEE_FRAME_HANDLE_LOCAL_AT,
-    XBEE_FRAME_TABLE_END
-};
-

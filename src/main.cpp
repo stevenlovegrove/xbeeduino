@@ -1,17 +1,10 @@
-// These defines are used within <zigbee/zcl_basic_attributes.h>
-// for reporting to communicating devices.
-#define ZCL_MANUFACTURER_NAME "lovegrovecorp"
-#define ZCL_MODEL_IDENTIFIER  "whichswitch"
-#define ZCL_POWER_SOURCE      ZCL_BASIC_PS_DC
-
 #include "zigbee++/zigbee_session.h"
 #include "zigbee++/cluster_level.h"
 #include "zigbee++/cluster_on_off.h"
 #include "zigbee++/cluster_basic.h"
-#include "zigbee++/util.h"
 
-zigbee_endpoint<cluster_on_off,cluster_level> ep0(0x00, "ep0");
-zigbee_endpoint<cluster_on_off,cluster_level> ep1(0x01, "ep1");
+zigbee_endpoint<cluster_basic,cluster_on_off,cluster_level> ep0(0x00, "ep0");
+zigbee_endpoint<cluster_basic,cluster_on_off,cluster_level> ep1(0x01, "ep1");
 zigbee_session session(ep0, ep1);
 
 int main(int argc, char *argv[])
@@ -21,6 +14,9 @@ int main(int argc, char *argv[])
         printf("  e.g. %s /dev/tty.usbserial-XXXXX 115200\n", argv[0]);
         return 0;
     }
+
+    cluster_basic::set_manufacturer_name("lovegrovecorp");
+    cluster_basic::set_model_identifier("whichswitch");
 
     ep0.get<cluster_on_off>().user_fn_try_update = [](){
         log("ep0 switch\n");

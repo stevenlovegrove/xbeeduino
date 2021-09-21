@@ -10,21 +10,6 @@ struct cluster_basic : public cluster_interface
     constexpr static uint16_t CLUSTOR_ID = ZCL_CLUST_BASIC;
     using fn_factory_reset = void(void);
 
-    cluster_basic()
-        : zcl_version(0x00), app_version(0x00), stack_version(0x00), hw_version(0x00),
-          manufacturer_name("\0"), model_identifier("\0"), power_source(ZCL_BASIC_PS_UNKNOWN),
-          user_fn_factory_reset(nullptr),
-          attributes{
-            { ZCL_BASIC_ATTR_ZCL_VERSION, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_UNSIGNED_8BIT, &zcl_version},
-            { ZCL_BASIC_ATTR_APP_VERSION, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_UNSIGNED_8BIT, &app_version},
-            { ZCL_BASIC_ATTR_STACK_VERSION, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_UNSIGNED_8BIT, &stack_version},
-            { ZCL_BASIC_ATTR_HW_VERSION, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_UNSIGNED_8BIT, &hw_version},
-            { ZCL_BASIC_ATTR_MANUFACTURER_NAME, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_STRING_CHAR, &manufacturer_name},
-            { ZCL_BASIC_ATTR_MODEL_IDENTIFIER, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_STRING_CHAR, &model_identifier},
-            { ZCL_BASIC_ATTR_POWER_SOURCE, ZCL_ATTRIB_FLAG_READONLY, ZCL_TYPE_ENUM_8BIT, &power_source},
-            { ZCL_ATTRIBUTE_END_OF_LIST }
-        } {}
-
     void config(zcl_command_t& zcl) override
     {
         send_configure_response(zcl, ZCL_STATUS_SUCCESS);
@@ -51,14 +36,25 @@ struct cluster_basic : public cluster_interface
         return attributes;
     }
 
-    uint8_t zcl_version;
-    uint8_t app_version;
-    uint8_t stack_version;
-    uint8_t hw_version;
-    uint8_t manufacturer_name[32];
-    uint8_t model_identifier[32];
-    uint8_t power_source;
+    static void set_manufacturer_name(const char* name)
+    {
+        strncpy((char*)manufacturer_name, name, 32);
+    }
 
-    fn_factory_reset* user_fn_factory_reset;
-    zcl_attribute_base_t attributes[8];
+    static void set_model_identifier(const char* name)
+    {
+        strncpy((char*)model_identifier, name, 32);
+    }
+
+    // These are static since they are the same for all endpoints.
+    static uint8_t zcl_version;
+    static uint8_t app_version;
+    static uint8_t stack_version;
+    static uint8_t hw_version;
+    static uint8_t manufacturer_name[32];
+    static uint8_t model_identifier[32];
+    static uint8_t power_source;
+
+    static fn_factory_reset* user_fn_factory_reset;
+    static zcl_attribute_base_t attributes[8];
 };

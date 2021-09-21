@@ -3,8 +3,6 @@
 #include <tuple>
 
 #include <zigbee/zcl.h>
-#include <zigbee/zcl_basic.h>
-#include <zigbee/zcl_basic_attributes.h>
 #include <zigbee/zdo.h>
 
 #include "cluster_interface.h"
@@ -22,7 +20,6 @@ struct zigbee_endpoint
               std::get<Clusters>(clusters).attributes...
           },
           clustertable{
-              ZCL_CLUST_ENTRY_BASIC_SERVER,
               {Clusters::CLUSTOR_ID, &dispatch_handler, this, WPAN_CLUST_FLAG_INPUT}...,
               WPAN_CLUST_ENTRY_LIST_END
             }
@@ -112,5 +109,5 @@ private:
     wpan_ep_state_t state;
     std::tuple<Clusters...> clusters;
     zcl_attribute_base_t* attrib_table_for_cluster[NUM_CLUSTERS];
-    wpan_cluster_table_entry_t clustertable[NUM_CLUSTERS+2]; // including BASIC + LIST_END
+    wpan_cluster_table_entry_t clustertable[NUM_CLUSTERS+1]; // including LIST_END
 };

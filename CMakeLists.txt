@@ -4,6 +4,13 @@ set (CMAKE_CXX_STANDARD 17)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/xbee/include)
 
+set(ZIGBEE_SESSION_SRC
+    "src/zigbee++/default_frame_handler_table.c" # get rid of this if you want to define your own.
+    "src/zigbee++/cluster_attrib_utils.cpp"
+    "src/zigbee++/cluster_basic.cpp"
+    "src/zigbee++/util.cpp"
+)
+
 set(XBEE_SRC
     "xbee/ports/posix/xbee_platform_posix.c"
 #    "xbee/ports/posix/xbee_readline.c"
@@ -27,6 +34,6 @@ set(XBEE_SRC
     "xbee/src/util/hexstrtobyte.c"
 )
 
-add_executable(xbeeduino src/main.cpp ${XBEE_SRC} )
+add_executable(xbeeduino src/main.cpp ${XBEE_SRC} ${ZIGBEE_SESSION_SRC})
 target_compile_definitions(xbeeduino PUBLIC POSIX XBEE_STD_CONFIG=0)
 #target_compile_definitions(xbeeduino PUBLIC XBEE_DEVICE_VERBOSE XBEE_ATCMD_VERBOSE XBEE_WPAN_VERBOSE ZCL_BASIC_VERBOSE ZIGBEE_ZCL_VERBOSE ZIGBEE_ZDO_VERBOSE)
