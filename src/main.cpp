@@ -45,7 +45,9 @@ int main(int argc, char *argv[])
 
     // Initialize the zigbee stack with the endpoints and communication params
     zigbee_session session(endpoints[0], endpoints[1]);
-    session.start(xbee_serial_config);
+    log("Connecting to Radio...\n");
+    session.start(xbee_serial_config, true);
+    log("Success!\n");
 
     // We control the processing loop (there are no threads)
     for (unsigned loop=0;; ++loop) {
