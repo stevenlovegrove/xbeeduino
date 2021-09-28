@@ -1,0 +1,31 @@
+{
+    "name": "xbeeduino",
+    "version": "1.0.0",
+    "description": "Utility for XBee development",
+    "keywords": "zigbee, xbee, zha, iot",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/stevenlovegrove/xbeeduino.git"
+    },
+    "authors":
+    [
+      {
+        "name": "Steven Lovegrove",
+        "email": "stevenlovegrove@gmail.com",
+        "url": "https://www.stevenlovegrove.com"
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/stevenlovegrove/xbeeduino",
+    "dependencies": {
+    },
+    "frameworks": "*",
+    "platforms": "*",
+    "build": {
+        "srcFilter": "+<zigbee++> +<*.cpp> +<*.c> -<main.cpp>",
+        "dependencies" : [
+          {"name":"xbee_ansic_library"}
+        ]
+    }
+  }

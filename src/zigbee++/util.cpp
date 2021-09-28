@@ -1,11 +1,10 @@
-#include <chrono>
-#include <thread>
-#include "log.h"
+#include <stdint.h>
 
-void delay(unsigned long ms)
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-}
+#ifndef __AVR__ // errno.h seems broken with AVR toolchain
+#  include <errno.h>
+#endif
+
+#include "log.h"
 
 uint8_t* strcpy_len_prefix(uint8_t* dest, const char* str)
 {
@@ -24,6 +23,7 @@ bool check_xbee_result(int res)
     char const* err;
 
     switch (res) {
+#ifndef __AVR__ // errno.h seems broken with AVR toolchain
     case -EPERM  : err = "Operation not permitted"; break;
     case -ENOENT : err = "No such file or directory"; break;
     case -ESRCH  : err = "No such process"; break;
@@ -56,6 +56,7 @@ bool check_xbee_result(int res)
     case -EROFS  : err = "Read-only file system"; break;
     case -EMLINK : err = "Too many links"; break;
     case -EPIPE  : err = "Broken pipe"; break;
+#endif
     default: err = nullptr;
     }
 
@@ -69,3 +70,12 @@ bool check_xbee_result(int res)
 }
 
 
+#ifndef ARDUINO
+#include <chrono>
+#include <thread>
+
+void delay(unsigned long ms)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+#endif

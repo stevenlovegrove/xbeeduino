@@ -1,6 +1,11 @@
 #pragma once
 
-#include <tuple>
+// No standard library with AVR toolchain right now.
+#ifdef __AVR__
+#  include "simple_tuple.h"
+#else
+#  include <tuple>
+#endif
 
 #include <zigbee/zcl.h>
 #include <zigbee/zdo.h>
