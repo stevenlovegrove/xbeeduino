@@ -16,7 +16,7 @@ uint8_t* put_attrib_requests(uint8_t* buffer, zcl_attribute_base_t* attrib_table
 {
     uint8_t* dest = buffer;
 
-    for(unsigned i=0; i < requests_size; ++i) {
+    for(int i=0; i < requests_size; ++i) {
         const uint16_t attrib = requests[i];
         const zcl_attribute_base_t* entry = zcl_find_attribute(attrib_table, attrib);
         if(entry) {
@@ -96,7 +96,6 @@ void report_attribs(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, con
         uint8_t payload[80];
     } request;
     int bytecount;
-    int retval = 0;
     wpan_envelope_t envelope;
 
     wpan_envelope_create( &envelope, &xdev.wpan_dev, WPAN_IEEE_ADDR_COORDINATOR, WPAN_NET_ADDR_COORDINATOR);
