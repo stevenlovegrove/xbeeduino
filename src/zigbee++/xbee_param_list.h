@@ -1,3 +1,10 @@
+#ifdef __AVR__
+#  define XBEE_TEMP_SE SE
+#  define XBEE_TEMP_SP SP
+#  undef SE
+#  undef SP
+#endif
+
 XBEE_PARAM(ID, "PAN ID")
 XBEE_PARAM(SC, "Scan Channels")
 XBEE_PARAM(SD, "Scan Duration")
@@ -79,3 +86,10 @@ XBEE_PARAM(IC, "Digital IO Change Detection")
 XBEE_PARAM(VR, "Firmware Version")
 XBEE_PARAM(HV, "Hardware Version")
 XBEE_PARAM(AI, "Association Indication")
+
+#ifdef __AVR__
+#  define SE XBEE_TEMP_SE
+#  define SP XBEE_TEMP_SP
+#  undef XBEE_TEMP_SE
+#  undef XBEE_TEMP_SP
+#endif
