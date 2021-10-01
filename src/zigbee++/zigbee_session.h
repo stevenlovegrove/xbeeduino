@@ -30,12 +30,21 @@ public:
 
         if(wait_for_modem_response) {
             while(int status = xbee_cmd_query_status(&xdev)) {
-                if(status == -EBUSY) {
-                    process_pending_frames();
-                }else{
-                    // we're done or there has been an error.
-                    check_xbee_result(status);
-                    break;
+                switch(status) {
+                    case XBEE_COMMAND_LIST_RUNNING:
+                        process_pending_frames();
+                        break;
+                    case XBEE_COMMAND_LIST_DONE:
+                        return;
+                    case XBEE_COMMAND_LIST_ERROR:
+                        log("xbee_cmd_query_status(): error\n");
+                        return;
+                    case XBEE_COMMAND_LIST_TIMEOUT:
+                        log("xbee_cmd_query_status(): timeout\n");
+                        return;
+                    default:
+                        log("xbee_cmd_query_status(): Unexpected status %d\n", status);
+                        return;
                 }
             }
         }
