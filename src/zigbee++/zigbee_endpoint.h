@@ -19,11 +19,8 @@ struct zigbee_endpoint
 {
     constexpr static unsigned NUM_CLUSTERS = sizeof...(Clusters);
 
-    zigbee_endpoint(uint8_t zigbee_endpoint_id, const char* friendly_name)
-        : zigbee_endpoint_id(zigbee_endpoint_id), friendly_name(friendly_name),
-          attrib_table_for_cluster{
-              std::get<Clusters>(clusters).attributes...
-          },
+    zigbee_endpoint(uint8_t zigbee_endpoint_id)
+        : zigbee_endpoint_id(zigbee_endpoint_id),
           clustertable{
               {Clusters::CLUSTOR_ID, &dispatch_handler, this, WPAN_CLUST_FLAG_INPUT}...,
               WPAN_CLUST_ENTRY_LIST_END
@@ -110,9 +107,7 @@ private:
     }
 
     const uint8_t zigbee_endpoint_id;
-    const char* friendly_name;
     wpan_ep_state_t state;
     std::tuple<Clusters...> clusters;
-    zcl_attribute_base_t* attrib_table_for_cluster[NUM_CLUSTERS];
     wpan_cluster_table_entry_t clustertable[NUM_CLUSTERS+1]; // including LIST_END
 };

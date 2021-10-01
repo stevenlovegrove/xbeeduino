@@ -31,7 +31,7 @@ struct cluster_basic : public cluster_interface
         send_attrib_table_response(zcl, attributes);
     }
 
-    zcl_attribute_base_t* get_attribs() override
+    const zcl_attribute_base_t* get_attribs() const override
     {
         return attributes;
     }

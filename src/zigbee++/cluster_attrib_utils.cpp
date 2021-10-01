@@ -12,7 +12,7 @@ uint8_t* put_atrib(uint8_t* buffer, const zcl_attribute_base_t* entry, bool incl
     return dest;
 }
 
-uint8_t* put_attrib_requests(uint8_t* buffer, zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests, unsigned max_size_bytes)
+uint8_t* put_attrib_requests(uint8_t* buffer, const zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests, unsigned max_size_bytes)
 {
     uint8_t* dest = buffer;
 
@@ -30,7 +30,7 @@ uint8_t* put_attrib_requests(uint8_t* buffer, zcl_attribute_base_t* attrib_table
     return dest;
 }
 
-uint8_t* put_attrib_table(uint8_t* buffer, zcl_attribute_base_t* attrib_table, unsigned max_size_bytes)
+uint8_t* put_attrib_table(uint8_t* buffer, const zcl_attribute_base_t* attrib_table, unsigned max_size_bytes)
 {
     assert(attrib_table);
     uint8_t* dest = buffer;
@@ -40,7 +40,7 @@ uint8_t* put_attrib_table(uint8_t* buffer, zcl_attribute_base_t* attrib_table, u
     return dest;
 }
 
-int send_attrib_requests(zcl_command_t& request, zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests)
+int send_attrib_requests(zcl_command_t& request, const zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests)
 {
     assert(attrib_table);
     const unsigned MAX_SIZE=40;
@@ -55,7 +55,7 @@ int send_attrib_requests(zcl_command_t& request, zcl_attribute_base_t* attrib_ta
     return zcl_send_response(&request, hdr_start, end - hdr_start);
 }
 
-int send_attrib_table_response(zcl_command_t& request, zcl_attribute_base_t* attrib_table)
+int send_attrib_table_response(zcl_command_t& request, const zcl_attribute_base_t* attrib_table)
 {
     const unsigned MAX_SIZE=40;
     PACKED_STRUCT{

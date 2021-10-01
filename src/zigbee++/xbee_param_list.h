@@ -1,8 +1,10 @@
 #ifdef __AVR__
 #  define XBEE_TEMP_SE SE
 #  define XBEE_TEMP_SP SP
+#  define XBEE_TEMP_SP PD
 #  undef SE
 #  undef SP
+#  undef PD
 #endif
 
 XBEE_PARAM(ID, "PAN ID")
@@ -90,6 +92,8 @@ XBEE_PARAM(AI, "Association Indication")
 #ifdef __AVR__
 #  define SE XBEE_TEMP_SE
 #  define SP XBEE_TEMP_SP
+#  define PD XBEE_TEMP_PD
 #  undef XBEE_TEMP_SE
 #  undef XBEE_TEMP_SP
+#  undef XBEE_TEMP_PD
 #endif

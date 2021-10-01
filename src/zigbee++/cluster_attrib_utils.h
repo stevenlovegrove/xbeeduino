@@ -25,13 +25,13 @@ BT* put_in_le_buffer(T val, BT* buffer, unsigned byte_offset=0)
 
 uint8_t* put_atrib(uint8_t* buffer, const zcl_attribute_base_t* entry, bool include_success, unsigned max_size_bytes);
 
-uint8_t* put_attrib_requests(uint8_t* buffer, zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests, unsigned max_size_bytes);
+uint8_t* put_attrib_requests(uint8_t* buffer, const zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests, unsigned max_size_bytes);
 
-uint8_t* put_attrib_table(uint8_t* buffer, zcl_attribute_base_t* attrib_table, unsigned max_size_bytes);
+uint8_t* put_attrib_table(uint8_t* buffer, const zcl_attribute_base_t* attrib_table, unsigned max_size_bytes);
 
-int send_attrib_requests(zcl_command_t& request, zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests);
+int send_attrib_requests(zcl_command_t& request, const zcl_attribute_base_t* attrib_table, int16_t requests_size, const uint16_t* requests);
 
-int send_attrib_table_response(zcl_command_t& request, zcl_attribute_base_t* attrib_table);
+int send_attrib_table_response(zcl_command_t& request, const zcl_attribute_base_t* attrib_table);
 
 int send_configure_response(zcl_command_t& request, uint8_t status);
 

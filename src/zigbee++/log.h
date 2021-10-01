@@ -1,10 +1,8 @@
 #pragma once
 
+// Swallow all args and ignore on Arduino
 #ifdef ARDUINO
-inline void log(const char* format, ...)
-{
-    // TODO: Replace with something sane.
-}
+#  define log(f,...)
 #else
 
 #include <cstdio>
