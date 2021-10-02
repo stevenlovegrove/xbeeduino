@@ -35,4 +35,4 @@ int send_attrib_table_response(zcl_command_t& request, const zcl_attribute_base_
 
 int send_configure_response(zcl_command_t& request, uint8_t status);
 
-void report_attribs(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint);
+void report_attribs(xbee_dev_t& xdev, uint16_t cluster_id, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint);

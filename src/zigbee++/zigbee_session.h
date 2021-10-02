@@ -55,6 +55,21 @@ public:
         check_xbee_result(xbee_dev_tick(&xdev));
     }
 
+    template<typename Cluster, typename EP>
+    void send_report(EP& endpoint)
+    {
+        const uint8_t endpoint_id = endpoint.get_id();
+        
+        for(const wpan_endpoint_table_entry_t *entry = table;
+            entry->endpoint != WPAN_ENDPOINT_END_OF_LIST; ++entry) 
+        {
+            if(entry->endpoint == endpoint_id) {
+                report_attribs(xdev, Cluster::CLUSTOR_ID, endpoint.template get<Cluster>().get_attribs(), entry );
+                return;
+            }
+        }
+    }
+
     void send_at_command(const char command[3], uint8_t* data, uint8_t data_len, xbee_cmd_callback_fn callback)
     {
         const int16_t handle = xbee_cmd_create(&xdev, command);

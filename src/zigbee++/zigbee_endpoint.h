@@ -28,6 +28,11 @@ struct zigbee_endpoint
     {
     }
 
+    uint8_t get_id() const
+    {
+        return zigbee_endpoint_id;
+    }
+
     wpan_endpoint_table_entry_t entry()
     {
         return {

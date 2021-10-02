@@ -8,9 +8,9 @@
         va_list arglist;
         va_start( arglist, format );
         char buffer[128];
-        snprintf(buffer, 128, format, arglist);
-        Serial.print(buffer);
+        int size = snprintf(buffer, 128, format, arglist);
         va_end( arglist );
+        Serial.write(buffer, size);
     }
 #else
     #include <cstdio>

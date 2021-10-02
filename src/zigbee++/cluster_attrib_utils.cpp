@@ -89,7 +89,7 @@ int send_configure_response(zcl_command_t& request, uint8_t status)
     return zcl_send_response(&request, hdr_start, dest - hdr_start);
 }
 
-void report_attribs(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint) {
+void report_attribs(xbee_dev_t& xdev, uint16_t cluster_id, const zcl_attribute_base_t *attr_list, const wpan_endpoint_table_entry_t *source_endpoint) {
     // This is meant for device side triggered notifications on state change
     PACKED_STRUCT request {
         zcl_header_nomfg_t header;
@@ -101,8 +101,8 @@ void report_attribs(xbee_dev_t& xdev, const zcl_attribute_base_t *attr_list, con
     wpan_envelope_create( &envelope, &xdev.wpan_dev, WPAN_IEEE_ADDR_COORDINATOR, WPAN_NET_ADDR_COORDINATOR);
     envelope.source_endpoint = source_endpoint->endpoint;
     envelope.dest_endpoint = 0x01;
-    envelope.cluster_id = ZCL_CLUST_ONOFF;
-    envelope.profile_id = WPAN_PROFILE_HOME_AUTOMATION;
+    envelope.cluster_id = cluster_id;
+    envelope.profile_id = source_endpoint->profile_id;
     envelope.payload = &request;
     request.header.frame_control = ZCL_FRAME_SERVER_TO_CLIENT
             | ZCL_FRAME_TYPE_PROFILE
