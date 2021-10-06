@@ -3,15 +3,27 @@
 // Swallow all args and ignore on Arduino
 #ifdef ARDUINO
     #include <Arduino.h>
-    inline void log(const char* format, ...)
+
+    inline void log(const char* fmt)
     {
-        va_list arglist;
-        va_start( arglist, format );
-        char buffer[128];
-        int size = snprintf(buffer, 128, format, arglist);
-        va_end( arglist );
-        Serial.write(buffer, size);
+        Serial.println(fmt);
     }
+
+    template<typename T, typename... Ts>
+    void log(const char* fmt, const T& x1, Ts... xs)
+    {
+        while( *fmt != '\0')
+        {
+            if( *fmt == '%') {
+                Serial.print(x1);
+                log(fmt+1, xs...);
+                return;
+            }
+            Serial.print(*fmt);
+            ++fmt;
+        }
+    }
+
 #else
     #include <cstdio>
     #include <cstdarg>

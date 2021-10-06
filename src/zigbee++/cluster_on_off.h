@@ -46,7 +46,7 @@ struct cluster_on_off : public cluster_interface
             e.new_value = !current_value;
             break;
         default:
-            log("Unrecognized command.\n");
+            log("Unrecognized command");
             zcl_command_dump(&zcl);
             zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
             return;

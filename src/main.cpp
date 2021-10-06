@@ -26,14 +26,14 @@ int main(int argc, char *argv[])
     for(auto& ep : endpoints) {
         ep.get<cluster_on_off>().current_value = false;
         ep.get<cluster_on_off>().fn_updated = [](cluster_on_off::event e) {
-            log("Endpoint %d turned %s\n", e.endpoint, e.new_value ? "on" : "off");
+            log("Endpoint % turned %", e.endpoint, e.new_value ? "on" : "off");
             return true;
         };;
 
         ep.get<cluster_level>().current_level = 0x80;
         ep.get<cluster_level>().fn_updated = [](cluster_level::event e) {
             const int percent = (int)((100.0f/255.0f)*e.new_value+0.5f);
-            log("Endpoint %d set level to %d%% (transition time %d)\n", e.endpoint, percent, e.transition_time);
+            log("Endpoint % set level to % (transition time %)", e.endpoint, percent, e.transition_time);
             return true;
         };
     }

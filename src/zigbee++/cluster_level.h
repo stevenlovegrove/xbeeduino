@@ -37,13 +37,13 @@ struct cluster_level : public cluster_interface
 
         switch(zcl.command) {
         case ZCL_LEVEL_CMD_MOVE:
-            log("ZCL_LEVEL_CMD_MOVE\n");
+            log("ZCL_LEVEL_CMD_MOVE");
             break;
         case ZCL_LEVEL_CMD_STEP:
-            log("ZCL_LEVEL_CMD_STEP\n");
+            log("ZCL_LEVEL_CMD_STEP");
             break;
         case ZCL_LEVEL_CMD_STOP:
-            log("ZCL_LEVEL_CMD_STOP\n");
+            log("ZCL_LEVEL_CMD_STOP");
             break;
         case ZCL_LEVEL_CMD_MOVE_TO_LEVEL:
             [[fallthrough]];
@@ -54,16 +54,16 @@ struct cluster_level : public cluster_interface
             break;
         }
         case ZCL_LEVEL_CMD_MOVE_ON_OFF:
-            log("ZCL_LEVEL_CMD_MOVE_ON_OFF\n");
+            log("ZCL_LEVEL_CMD_MOVE_ON_OFF");
             break;
         case ZCL_LEVEL_CMD_STEP_ON_OFF:
-            log("ZCL_LEVEL_CMD_STEP_ON_OFF\n");
+            log("ZCL_LEVEL_CMD_STEP_ON_OFF");
             break;
         case ZCL_LEVEL_CMD_STOP_ON_OFF:
-            log("ZCL_LEVEL_CMD_STOP_ON_OFF\n");
+            log("ZCL_LEVEL_CMD_STOP_ON_OFF");
             break;
         default:
-            log("Unrecognized command.\n");
+            log("Unrecognized command");
             zcl_command_dump(&zcl);
             zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
             return;

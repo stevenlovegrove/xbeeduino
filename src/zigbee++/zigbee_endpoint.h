@@ -86,7 +86,7 @@ private:
                 } else if(zcl.command == ZCL_CMD_DEFAULT_RESP) {
                     return zcl_default_response(&zcl, ZCL_STATUS_SUCCESS);
                 }else {
-                    log("Unhandled Profile command received\n");
+                    log("Unhandled Profile command received");
                     zcl_command_dump(&zcl);
                     return zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
                 }
@@ -94,12 +94,12 @@ private:
                 cluster->command(zcl);
                 return 0;
             }else{
-                log("Unrecognized cluster message.\n");
+                log("Unrecognized cluster message.");
                 zcl_command_dump(&zcl);
                 return zcl_default_response(&zcl, ZCL_STATUS_UNSUP_GENERAL_COMMAND);
             }
         } else {
-            log("Unable to build ZCL Structure.\n");
+            log("Unable to build ZCL Structure.");
             return 0;
         }
         return 0;
