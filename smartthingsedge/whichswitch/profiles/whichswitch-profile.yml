@@ -10,13 +10,14 @@ components:
     version: 1
   categories:
   - name: Switch
-- id: relay2
-  capabilities:
-  - id: switch
-    version: 1
-  - id: switchLevel
-    version: 1
-  - id: refresh
-    version: 1
-  categories:
-  - name: Switch
+preferences:
+  - title: "Connected Lights"
+    name: lightAddresses
+    description: "The Zigbee Network Addresses for lights to control"
+    required: false
+    preferenceType: string
+    definition:
+      minLength: 0
+      maxLength: 20
+      stringType: text
+      default: ""

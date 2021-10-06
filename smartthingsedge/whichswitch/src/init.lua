@@ -8,19 +8,22 @@ local log = require "log"
 local clusters = require "st.zigbee.zcl.clusters"
 local cluster_base = require "st.zigbee.cluster_base"
 
+ENDPOINT1 = 0xA7
+-- ENDPOINT2 = 0xA8
+
 local function component_to_endpoint(device, component_id)
   if component_id == "main" then
-    return 0x00
-  elseif component_id == "relay2" then
-    return 0x01
+    return ENDPOINT1
+  -- elseif component_id == "relay2" then
+  --   return ENDPOINT2
   end
 end
 
 local function endpoint_to_component(device, ep)
-  if ep == 0x00 then
+  if ep == ENDPOINT1 then
     return "main"
-  elseif ep == 0x01 then
-    return "relay2"
+  -- elseif ep == ENDPOINT2 then
+  --   return "relay2"
   end
 end
 
